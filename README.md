@@ -1,0 +1,1 @@
+docker run image MySQL: <br/> docker run -d --name hotel-booking-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=hotel-booking-db -e MYSQL_USER=user -e MYSQL_PASSWORD=123 -p 3312:3306 mysql:latest
