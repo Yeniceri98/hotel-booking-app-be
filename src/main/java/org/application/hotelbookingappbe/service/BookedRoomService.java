@@ -1,4 +1,7 @@
 package org.application.hotelbookingappbe.service;
 
-public interface BookedRoomService {
+import org.springframework.stereotype.Service;
+
+@Service
+public class BookedRoomService {
 }

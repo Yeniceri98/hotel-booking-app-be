@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +24,7 @@ public class Room {
     private Boolean isBooked = false;
 
     @Lob
-    private Blob photo;
+    private byte[] photo;
 
     @OneToMany(
             fetch = FetchType.LAZY,
