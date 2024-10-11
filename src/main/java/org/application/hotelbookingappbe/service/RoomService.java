@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -22,6 +23,11 @@ public class RoomService {
         Room room = mapToEntity(photo, roomType, roomPrice);
         Room savedRoom = roomRepository.save(room);
         return mapToDto(savedRoom);
+    }
+
+    public List<RoomResponseDto> getRoomTypes() {
+        List<Room> rooms = roomRepository.findAll();
+        return rooms.stream().map(this::mapToDto).toList();
     }
 
     private Room mapToEntity(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {
@@ -53,4 +59,6 @@ public class RoomService {
 
         return roomResponseDto;
     }
+
+
 }
