@@ -23,7 +23,7 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    @PostMapping("/add-room")
+    @PostMapping("/rooms/add-room")
     public ResponseEntity<RoomResponseDto> addRoom(
             @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam("roomType") String roomType,
