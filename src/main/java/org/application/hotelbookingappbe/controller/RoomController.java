@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -26,8 +25,8 @@ public class RoomController {
             @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam("roomType") String roomType,
             @RequestParam("roomPrice") BigDecimal roomPrice
-    ) throws IOException, SQLException {
-        return new ResponseEntity<>(roomService.addRoom(photo, roomType, roomPrice), HttpStatus.OK);
+    ) throws IOException {
+        return new ResponseEntity<>(roomService.addRoom(photo, roomType, roomPrice), HttpStatus.CREATED);
     }
 
     @GetMapping("/room-types")
