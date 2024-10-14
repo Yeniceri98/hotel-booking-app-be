@@ -30,7 +30,7 @@ public class RoomController {
     }
 
     @GetMapping("/room-types")
-    public ResponseEntity<List<RoomResponseDto>> getRoomTypes() {
+    public ResponseEntity<List<String>> getRoomTypes() {
         return new ResponseEntity<>(roomService.getRoomTypes(), HttpStatus.OK);
     }
 }

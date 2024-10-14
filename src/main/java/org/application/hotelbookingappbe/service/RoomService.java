@@ -25,9 +25,8 @@ public class RoomService {
         return mapToDto(savedRoom);
     }
 
-    public List<RoomResponseDto> getRoomTypes() {
-        List<Room> rooms = roomRepository.findAll();
-        return rooms.stream().map(this::mapToDto).toList();
+    public List<String> getRoomTypes() {
+        return roomRepository.findDistinctRoomTypes();
     }
 
     private Room mapToEntity(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {
