@@ -13,5 +13,4 @@ public class RoomResponseDto {
     private Long id;
     private String roomType;
     private BigDecimal roomPrice;
-    private String photo;
 }
