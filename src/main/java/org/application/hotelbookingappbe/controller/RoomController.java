@@ -1,7 +1,6 @@
 package org.application.hotelbookingappbe.controller;
 
 import org.application.hotelbookingappbe.dto.RoomResponseDto;
-import org.application.hotelbookingappbe.service.BookingService;
 import org.application.hotelbookingappbe.service.RoomService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +20,7 @@ import java.util.List;
 public class RoomController {
     private final RoomService roomService;
 
-    public RoomController(RoomService roomService, BookingService bookingService) {
+    public RoomController(RoomService roomService) {
         this.roomService = roomService;
     }
 
@@ -70,5 +69,11 @@ public class RoomController {
             @RequestParam("roomType") String roomType
     ) {
         return new ResponseEntity<>(roomService.getAvailableRooms(checkInDate, checkOutDate, roomType), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete-room/{roomId}")
+    public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
+        roomService.deleteRoom(roomId);
+        return new ResponseEntity<>("Room deleted successfully", HttpStatus.OK);
     }
 } 

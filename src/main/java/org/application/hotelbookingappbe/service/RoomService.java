@@ -36,12 +36,12 @@ public class RoomService {
     }
 
     public RoomResponseDto getRoomById(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
         return mapToDto(room);
     }
 
     public byte[] getRoomPhotoByRoomId(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
         return room.getPhoto();
     }
 
@@ -53,6 +53,11 @@ public class RoomService {
         List<Room> availableRooms = allRooms.stream().filter(room -> !bookedRooms.contains(room)).toList();
 
         return availableRooms.stream().map(this::mapToDto).toList();
+    }
+
+    public void deleteRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        roomRepository.delete(room);
     }
 
     private Room mapToEntity(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {
