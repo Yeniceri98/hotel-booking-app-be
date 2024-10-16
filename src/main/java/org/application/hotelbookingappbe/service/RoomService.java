@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -42,6 +43,16 @@ public class RoomService {
     public byte[] getRoomPhotoByRoomId(Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room not found"));
         return room.getPhoto();
+    }
+
+    public List<RoomResponseDto> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
+        List<Room> bookedRooms = roomRepository.findBookedRoomsInDateRange(checkInDate, checkOutDate, roomType);
+
+        List<Room> allRooms = roomRepository.findByRoomType(roomType);
+
+        List<Room> availableRooms = allRooms.stream().filter(room -> !bookedRooms.contains(room)).toList();
+
+        return availableRooms.stream().map(this::mapToDto).toList();
     }
 
     private Room mapToEntity(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {

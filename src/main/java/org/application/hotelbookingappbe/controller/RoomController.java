@@ -1,7 +1,9 @@
 package org.application.hotelbookingappbe.controller;
 
 import org.application.hotelbookingappbe.dto.RoomResponseDto;
+import org.application.hotelbookingappbe.service.BookingService;
 import org.application.hotelbookingappbe.service.RoomService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,7 +21,7 @@ import java.util.List;
 public class RoomController {
     private final RoomService roomService;
 
-    public RoomController(RoomService roomService) {
+    public RoomController(RoomService roomService, BookingService bookingService) {
         this.roomService = roomService;
     }
 
@@ -59,4 +62,13 @@ public class RoomController {
 
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
     }
-}
+
+    @GetMapping("/available-rooms")
+    public ResponseEntity<List<RoomResponseDto>> getAvailableRooms(
+            @RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+            @RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+            @RequestParam("roomType") String roomType
+    ) {
+        return new ResponseEntity<>(roomService.getAvailableRooms(checkInDate, checkOutDate, roomType), HttpStatus.OK);
+    }
+} 
