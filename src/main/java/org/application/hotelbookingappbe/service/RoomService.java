@@ -55,6 +55,19 @@ public class RoomService {
         return availableRooms.stream().map(this::mapToDto).toList();
     }
 
+    public RoomResponseDto updateRoom(Long roomId, String roomType, BigDecimal roomPrice, MultipartFile photo) throws IOException {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        room.setRoomType(roomType);
+        room.setRoomPrice(roomPrice);
+
+        if (photo != null && !photo.isEmpty()) {
+            room.setPhoto(photo.getBytes());
+        }
+
+        Room updatedRoom = roomRepository.save(room);
+        return mapToDto(updatedRoom);
+    }
+
     public void deleteRoom(Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
         roomRepository.delete(room);

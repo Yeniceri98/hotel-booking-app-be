@@ -71,6 +71,16 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getAvailableRooms(checkInDate, checkOutDate, roomType), HttpStatus.OK);
     }
 
+    @PutMapping("/room/{roomId}")
+    public ResponseEntity<RoomResponseDto> updateRoom(
+            @PathVariable Long roomId,
+            @RequestParam("roomType") String roomType,
+            @RequestParam("roomPrice") BigDecimal roomPrice,
+            @RequestParam(value = "photo", required = false) MultipartFile photo
+    ) throws IOException {
+        return new ResponseEntity<>(roomService.updateRoom(roomId, roomType, roomPrice, photo), HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete-room/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
         roomService.deleteRoom(roomId);
