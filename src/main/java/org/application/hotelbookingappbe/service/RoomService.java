@@ -1,7 +1,7 @@
 package org.application.hotelbookingappbe.service;
 
 import org.application.hotelbookingappbe.dto.RoomResponseDto;
-import org.application.hotelbookingappbe.exception.RoomNotFoundException;
+import org.application.hotelbookingappbe.exception.RoomIsNotFoundException;
 import org.application.hotelbookingappbe.model.Room;
 import org.application.hotelbookingappbe.repository.RoomRepository;
 import org.springframework.stereotype.Service;
@@ -36,12 +36,16 @@ public class RoomService {
     }
 
     public RoomResponseDto getRoomById(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         return mapToDto(room);
     }
 
+    public Room getRoomEntityById(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
+    }
+
     public byte[] getRoomPhotoByRoomId(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         return room.getPhoto();
     }
 
@@ -56,7 +60,7 @@ public class RoomService {
     }
 
     public RoomResponseDto updateRoom(Long roomId, String roomType, BigDecimal roomPrice, MultipartFile photo) throws IOException {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         room.setRoomType(roomType);
         room.setRoomPrice(roomPrice);
 
@@ -69,7 +73,7 @@ public class RoomService {
     }
 
     public void deleteRoom(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room is not found"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         roomRepository.delete(room);
     }
 
