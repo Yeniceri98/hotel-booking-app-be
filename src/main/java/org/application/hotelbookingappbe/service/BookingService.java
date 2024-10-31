@@ -52,6 +52,10 @@ public class BookingService {
         return mapToDto(savedBooking);
     }
 
+    public void deleteBooking(Long bookingId) {
+        bookingRepository.deleteById(bookingId);
+    }
+
     private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
         return existingBookings.stream()
                 .noneMatch(existingBooking ->
@@ -91,4 +95,6 @@ public class BookingService {
         dto.setBookingConfirmationCode(bookedRoom.getBookingConfirmationCode());
         return dto;
     }
+
+
 }
