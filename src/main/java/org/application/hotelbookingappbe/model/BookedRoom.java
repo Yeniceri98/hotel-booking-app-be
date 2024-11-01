@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,9 +20,11 @@ public class BookedRoom {
     private Long bookingId;
 
     @Column(name = "check_in")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate checkInDate;
 
     @Column(name = "check_out")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate checkOutDate;
 
     private String guestFullName;

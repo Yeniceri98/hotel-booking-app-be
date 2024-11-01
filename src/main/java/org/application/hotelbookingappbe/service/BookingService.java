@@ -1,7 +1,7 @@
 package org.application.hotelbookingappbe.service;
 
 import org.application.hotelbookingappbe.dto.BookedRoomResponseDto;
-import org.application.hotelbookingappbe.exception.BookingsNotFoundException;
+import org.application.hotelbookingappbe.exception.BookingIsNotFoundException;
 import org.application.hotelbookingappbe.exception.InvalidBookingRequestException;
 import org.application.hotelbookingappbe.exception.RoomIsNotAvailableException;
 import org.application.hotelbookingappbe.model.BookedRoom;
@@ -25,14 +25,26 @@ public class BookingService {
         List<BookedRoom> bookedRooms = bookingRepository.findAll();
 
         if (bookedRooms.isEmpty()) {
-            throw new BookingsNotFoundException("Booking not found");
+            throw new BookingIsNotFoundException("Booking is not found");
         }
 
         return bookedRooms.stream().map(this::mapToDto).toList();
     }
 
-    public BookedRoom getBookingByConfirmationCode(String bookingConfirmationCode) {
-        return bookingRepository.findByBookingConfirmationCode(bookingConfirmationCode).orElseThrow(() -> new BookingsNotFoundException("Booking not found"));
+    public BookedRoomResponseDto getBookingByConfirmationCode(String confirmationCode) {
+        BookedRoom bookedRoom = bookingRepository.findByBookingConfirmationCode(confirmationCode).orElseThrow(
+                () -> new BookingIsNotFoundException("Booking is not found with this booking confirmation code: " + confirmationCode));
+        return mapToDto(bookedRoom);
+    }
+
+    public List<BookedRoomResponseDto> getBookingsByEmail(String email) {
+        List<BookedRoom> bookedRooms = bookingRepository.findByGuestEmail(email);
+
+        if (bookedRooms.isEmpty()) {
+            throw new BookingIsNotFoundException("Booking is not found with this email: " + email);
+        }
+
+        return bookedRooms.stream().map(this::mapToDto).toList();
     }
 
     public BookedRoomResponseDto addBooking(Long roomId, BookedRoom bookedRoom) {
@@ -53,6 +65,10 @@ public class BookingService {
     }
 
     public void deleteBooking(Long bookingId) {
+        if (!bookingRepository.existsById(bookingId)) {
+            throw new BookingIsNotFoundException("Booking is not found with this id: " + bookingId);
+        }
+
         bookingRepository.deleteById(bookingId);
     }
 
@@ -95,6 +111,4 @@ public class BookingService {
         dto.setBookingConfirmationCode(bookedRoom.getBookingConfirmationCode());
         return dto;
     }
-
-
 }

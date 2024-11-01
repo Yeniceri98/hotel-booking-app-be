@@ -23,9 +23,14 @@ public class BookingController {
         return new ResponseEntity<>(bookingService.getAllBookedRooms(), HttpStatus.OK);
     }
 
-    @GetMapping("/all-booked-rooms/{bookingConfirmationCode}")
-    public ResponseEntity<BookedRoom> getBookingByConfirmationCode(@PathVariable String bookingConfirmationCode) {
-        return new ResponseEntity<>(bookingService.getBookingByConfirmationCode(bookingConfirmationCode), HttpStatus.OK);
+    @GetMapping("/all-booked-rooms/confirmation-code/{confirmationCode}")
+    public ResponseEntity<BookedRoomResponseDto> getBookingByConfirmationCode(@PathVariable String confirmationCode) {
+        return new ResponseEntity<>(bookingService.getBookingByConfirmationCode(confirmationCode), HttpStatus.OK);
+    }
+
+    @GetMapping("all-booked-rooms/email/{email}")
+    public ResponseEntity<List<BookedRoomResponseDto>> getBookingsByEmail(@PathVariable String email) {
+        return new ResponseEntity<>(bookingService.getBookingsByEmail(email), HttpStatus.OK);
     }
 
     @PostMapping("/add-booking/{roomId}")
