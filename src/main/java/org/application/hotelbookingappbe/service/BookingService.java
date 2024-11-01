@@ -21,7 +21,7 @@ public class BookingService {
         this.roomService = roomService;
     }
 
-    public List<BookedRoomResponseDto> getAllBookedRooms() {
+    public List<BookedRoomResponseDto> getAllBookings() {
         List<BookedRoom> bookedRooms = bookingRepository.findAll();
 
         if (bookedRooms.isEmpty()) {

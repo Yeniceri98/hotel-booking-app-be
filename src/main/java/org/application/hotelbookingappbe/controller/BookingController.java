@@ -19,8 +19,8 @@ public class BookingController {
     }
 
     @GetMapping("/all-booked-rooms")
-    public ResponseEntity<List<BookedRoomResponseDto>> getAllBookedRooms() {
-        return new ResponseEntity<>(bookingService.getAllBookedRooms(), HttpStatus.OK);
+    public ResponseEntity<List<BookedRoomResponseDto>> getAllBookings() {
+        return new ResponseEntity<>(bookingService.getAllBookings(), HttpStatus.OK);
     }
 
     @GetMapping("/all-booked-rooms/confirmation-code/{confirmationCode}")
