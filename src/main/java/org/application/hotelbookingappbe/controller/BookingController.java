@@ -18,17 +18,17 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @GetMapping("/all-booked-rooms")
+    @GetMapping
     public ResponseEntity<List<BookedRoomResponseDto>> getAllBookings() {
         return new ResponseEntity<>(bookingService.getAllBookings(), HttpStatus.OK);
     }
 
-    @GetMapping("/all-booked-rooms/confirmation-code/{confirmationCode}")
+    @GetMapping("/confirmation-code/{confirmationCode}")
     public ResponseEntity<BookedRoomResponseDto> getBookingByConfirmationCode(@PathVariable String confirmationCode) {
         return new ResponseEntity<>(bookingService.getBookingByConfirmationCode(confirmationCode), HttpStatus.OK);
     }
 
-    @GetMapping("all-booked-rooms/email/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<List<BookedRoomResponseDto>> getBookingsByEmail(@PathVariable String email) {
         return new ResponseEntity<>(bookingService.getBookingsByEmail(email), HttpStatus.OK);
     }
