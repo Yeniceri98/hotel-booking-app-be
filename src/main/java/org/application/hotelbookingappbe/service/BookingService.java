@@ -1,10 +1,11 @@
 package org.application.hotelbookingappbe.service;
 
-import org.application.hotelbookingappbe.dto.BookedRoomResponseDto;
+import org.application.hotelbookingappbe.dto.BookingDto;
+import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.exception.BookingIsNotFoundException;
 import org.application.hotelbookingappbe.exception.InvalidBookingRequestException;
 import org.application.hotelbookingappbe.exception.RoomIsNotAvailableException;
-import org.application.hotelbookingappbe.model.BookedRoom;
+import org.application.hotelbookingappbe.model.Booking;
 import org.application.hotelbookingappbe.model.Room;
 import org.application.hotelbookingappbe.repository.BookingRepository;
 import org.springframework.stereotype.Service;
@@ -21,46 +22,49 @@ public class BookingService {
         this.roomService = roomService;
     }
 
-    public List<BookedRoomResponseDto> getAllBookings() {
-        List<BookedRoom> bookedRooms = bookingRepository.findAll();
+    public List<BookingDto> getAllBookings() {
+        List<Booking> bookings = bookingRepository.findAll();
 
-        if (bookedRooms.isEmpty()) {
+        if (bookings.isEmpty()) {
             throw new BookingIsNotFoundException("Booking is not found");
         }
 
-        return bookedRooms.stream().map(this::mapToDto).toList();
+        return bookings.stream().map(this::mapToDto).toList();
     }
 
-    public BookedRoomResponseDto getBookingByConfirmationCode(String confirmationCode) {
-        BookedRoom bookedRoom = bookingRepository.findByBookingConfirmationCode(confirmationCode).orElseThrow(
+    public BookingDto getBookingByConfirmationCode(String confirmationCode) {
+        Booking booking = bookingRepository.findByBookingConfirmationCode(confirmationCode).orElseThrow(
                 () -> new BookingIsNotFoundException("Booking is not found with this booking confirmation code: " + confirmationCode));
-        return mapToDto(bookedRoom);
+        return mapToDto(booking);
     }
 
-    public List<BookedRoomResponseDto> getBookingsByEmail(String email) {
-        List<BookedRoom> bookedRooms = bookingRepository.findByGuestEmail(email);
+    public List<BookingDto> getBookingsByEmail(String email) {
+        List<Booking> bookings = bookingRepository.findByGuestEmail(email);
 
-        if (bookedRooms.isEmpty()) {
+        if (bookings.isEmpty()) {
             throw new BookingIsNotFoundException("Booking is not found with this email: " + email);
         }
 
-        return bookedRooms.stream().map(this::mapToDto).toList();
+        return bookings.stream().map(this::mapToDto).toList();
     }
 
-    public BookedRoomResponseDto addBooking(Long roomId, BookedRoom bookedRoom) {
-        if (bookedRoom.getCheckOutDate().isBefore(bookedRoom.getCheckInDate())) {
+    public BookingDto addBooking(Long roomId, BookingDto bookingDto) {
+        Booking booking = mapToEntity(bookingDto);
+
+        if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
             throw new InvalidBookingRequestException("Check out date cannot be before check in date");
         }
 
         Room room = roomService.getRoomEntityById(roomId);
-        List<BookedRoom> existingBookings = room.getBookedRooms();
+        List<Booking> existingBookings = room.getBookings();
 
-        if (!roomIsAvailable(bookedRoom, existingBookings)) {
+        if (!roomIsAvailable(booking, existingBookings)) {
             throw new RoomIsNotAvailableException("Room is not available for the selected dates");
         }
 
-        room.addBooking(bookedRoom);
-        BookedRoom savedBooking = bookingRepository.save(bookedRoom);
+        room.addBooking(booking);
+        Booking savedBooking = bookingRepository.save(booking);
+
         return mapToDto(savedBooking);
     }
 
@@ -72,7 +76,7 @@ public class BookingService {
         bookingRepository.deleteById(bookingId);
     }
 
-    private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
+    private boolean roomIsAvailable(Booking bookingRequest, List<Booking> existingBookings) {
         return existingBookings.stream()
                 .noneMatch(existingBooking ->
                         bookingRequest.getCheckInDate().equals(existingBooking.getCheckInDate())
@@ -94,21 +98,36 @@ public class BookingService {
                 );
     }
 
-    private BookedRoom mapToEntity(BookedRoomResponseDto bookedRoomResponseDto) {
-        BookedRoom bookedRoom = new BookedRoom();
-        bookedRoom.setBookingId(bookedRoomResponseDto.getBookingId());
-        bookedRoom.setCheckInDate(bookedRoomResponseDto.getCheckInDate());
-        bookedRoom.setCheckOutDate(bookedRoomResponseDto.getCheckOutDate());
-        bookedRoom.setBookingConfirmationCode(bookedRoomResponseDto.getBookingConfirmationCode());
-        return bookedRoom;
+    private Booking mapToEntity(BookingDto bookingDto) {
+        Booking booking = new Booking();
+        booking.setCheckInDate(bookingDto.getCheckInDate());
+        booking.setCheckOutDate(bookingDto.getCheckOutDate());
+        booking.setGuestName(bookingDto.getGuestName());
+        booking.setGuestEmail(bookingDto.getGuestEmail());
+        booking.setNumOfAdults(bookingDto.getNumOfAdults());
+        booking.setNumOfChildren(bookingDto.getNumOfChildren());
+        return booking;
     }
 
-    private BookedRoomResponseDto mapToDto(BookedRoom bookedRoom) {
-        BookedRoomResponseDto dto = new BookedRoomResponseDto();
-        dto.setBookingId(bookedRoom.getBookingId());
-        dto.setCheckInDate(bookedRoom.getCheckInDate());
-        dto.setCheckOutDate(bookedRoom.getCheckOutDate());
-        dto.setBookingConfirmationCode(bookedRoom.getBookingConfirmationCode());
+    private BookingDto mapToDto(Booking booking) {
+        BookingDto dto = new BookingDto();
+        dto.setBookingId(booking.getBookingId());
+        dto.setCheckInDate(booking.getCheckInDate());
+        dto.setCheckOutDate(booking.getCheckOutDate());
+        dto.setGuestName(booking.getGuestName());
+        dto.setGuestEmail(booking.getGuestEmail());
+        dto.setNumOfAdults(booking.getNumOfAdults());
+        dto.setNumOfChildren(booking.getNumOfChildren());
+        dto.setBookingConfirmationCode(booking.getBookingConfirmationCode());
+
+        if (booking.getRoom() != null) {
+            RoomDto roomDto = new RoomDto();
+            roomDto.setId(booking.getRoom().getId());
+            roomDto.setRoomType(booking.getRoom().getRoomType());
+            roomDto.setRoomPrice(booking.getRoom().getRoomPrice());
+            dto.setRoom(roomDto);
+        }
+
         return dto;
     }
 }
