@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookedRoomResponseDto {
+public class BookingDto {
     private Long bookingId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -19,5 +19,11 @@ public class BookedRoomResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate checkOutDate;
 
+    private String guestName;
+    private String guestEmail;
+    private Integer numOfAdults;
+    private Integer numOfChildren;
     private String bookingConfirmationCode;
+    private RoomDto room;
+
 }
