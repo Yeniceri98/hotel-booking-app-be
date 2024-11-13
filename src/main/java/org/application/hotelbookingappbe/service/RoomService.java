@@ -1,6 +1,6 @@
 package org.application.hotelbookingappbe.service;
 
-import org.application.hotelbookingappbe.dto.RoomResponseDto;
+import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.exception.RoomIsNotFoundException;
 import org.application.hotelbookingappbe.model.Room;
 import org.application.hotelbookingappbe.repository.RoomRepository;
@@ -20,7 +20,7 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
-    public RoomResponseDto addRoom(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {
+    public RoomDto addRoom(MultipartFile photo, String roomType, BigDecimal roomPrice) throws IOException {
         Room room = mapToEntity(photo, roomType, roomPrice);
         Room savedRoom = roomRepository.save(room);
         return mapToDto(savedRoom);
@@ -30,12 +30,12 @@ public class RoomService {
         return roomRepository.findDistinctRoomTypes();
     }
 
-    public List<RoomResponseDto> getAllRooms() {
+    public List<RoomDto> getAllRooms() {
         List<Room> rooms = roomRepository.findAll();
         return rooms.stream().map(this::mapToDto).toList();
     }
 
-    public RoomResponseDto getRoomById(Long roomId) {
+    public RoomDto getRoomById(Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         return mapToDto(room);
     }
@@ -49,7 +49,7 @@ public class RoomService {
         return room.getPhoto();
     }
 
-    public List<RoomResponseDto> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
+    public List<RoomDto> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType) {
         List<Room> bookedRooms = roomRepository.findBookedRoomsInDateRange(checkInDate, checkOutDate, roomType);
 
         List<Room> allRooms = roomRepository.findByRoomType(roomType);
@@ -59,7 +59,7 @@ public class RoomService {
         return availableRooms.stream().map(this::mapToDto).toList();
     }
 
-    public RoomResponseDto updateRoom(Long roomId, String roomType, BigDecimal roomPrice, MultipartFile photo) throws IOException {
+    public RoomDto updateRoom(Long roomId, String roomType, BigDecimal roomPrice, MultipartFile photo) throws IOException {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomIsNotFoundException("Room is not found"));
         room.setRoomType(roomType);
         room.setRoomPrice(roomPrice);
@@ -91,12 +91,12 @@ public class RoomService {
         return room;
     }
 
-    private RoomResponseDto mapToDto(Room room) {
-        RoomResponseDto roomResponseDto = new RoomResponseDto();
-        roomResponseDto.setId(room.getId());
-        roomResponseDto.setRoomType(room.getRoomType());
-        roomResponseDto.setRoomPrice(room.getRoomPrice());
+    private RoomDto mapToDto(Room room) {
+        RoomDto roomDto = new RoomDto();
+        roomDto.setId(room.getId());
+        roomDto.setRoomType(room.getRoomType());
+        roomDto.setRoomPrice(room.getRoomPrice());
 
-        return roomResponseDto;
+        return roomDto;
     }
 }

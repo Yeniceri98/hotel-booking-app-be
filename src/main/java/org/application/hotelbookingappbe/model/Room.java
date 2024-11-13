@@ -31,19 +31,19 @@ public class Room {
             cascade = CascadeType.ALL,
             mappedBy = "room"
     )
-    private List<BookedRoom> bookedRooms;
+    private List<Booking> bookings;
 
-    public void addBooking(BookedRoom bookedRoom) {
-        if (bookedRooms == null) {
-            bookedRooms = new ArrayList<>();
+    public void addBooking(Booking booking) {
+        if (bookings == null) {
+            bookings = new ArrayList<>();
         }
 
-        bookedRooms.add(bookedRoom);
-        bookedRoom.setRoom(this);
+        bookings.add(booking);
+        booking.setRoom(this);
 
         isBooked = true;
 
         String confirmationCode = UUID.randomUUID().toString();
-        bookedRoom.setBookingConfirmationCode(confirmationCode);
+        booking.setBookingConfirmationCode(confirmationCode);
     }
 }

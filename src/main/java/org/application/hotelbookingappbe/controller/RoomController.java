@@ -1,6 +1,6 @@
 package org.application.hotelbookingappbe.controller;
 
-import org.application.hotelbookingappbe.dto.RoomResponseDto;
+import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.service.RoomService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +25,7 @@ public class RoomController {
     }
 
     @PostMapping("/add-room")
-    public ResponseEntity<RoomResponseDto> addRoom(
+    public ResponseEntity<RoomDto> addRoom(
             @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam("roomType") String roomType,
             @RequestParam("roomPrice") BigDecimal roomPrice
@@ -39,12 +39,12 @@ public class RoomController {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<RoomResponseDto> getRoomById(@PathVariable Long roomId) {
+    public ResponseEntity<RoomDto> getRoomById(@PathVariable Long roomId) {
         return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
     }
 
     @GetMapping("/all-rooms")
-    public ResponseEntity<List<RoomResponseDto>> getAllRooms() {
+    public ResponseEntity<List<RoomDto>> getAllRooms() {
         return new ResponseEntity<>(roomService.getAllRooms(), HttpStatus.OK);
     }
 
@@ -63,7 +63,7 @@ public class RoomController {
     }
 
     @GetMapping("/available-rooms")
-    public ResponseEntity<List<RoomResponseDto>> getAvailableRooms(
+    public ResponseEntity<List<RoomDto>> getAvailableRooms(
             @RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
             @RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
             @RequestParam("roomType") String roomType
@@ -72,7 +72,7 @@ public class RoomController {
     }
 
     @PutMapping("/room/{roomId}")
-    public ResponseEntity<RoomResponseDto> updateRoom(
+    public ResponseEntity<RoomDto> updateRoom(
             @PathVariable Long roomId,
             @RequestParam("roomType") String roomType,
             @RequestParam("roomPrice") BigDecimal roomPrice,
