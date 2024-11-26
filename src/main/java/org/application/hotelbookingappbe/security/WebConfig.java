@@ -1,4 +1,4 @@
-package org.application.hotelbookingappbe.configuration;
+package org.application.hotelbookingappbe.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
