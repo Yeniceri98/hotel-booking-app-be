@@ -27,14 +27,30 @@ public class RoleController {
 
     @GetMapping("/{name}")
     public ResponseEntity<Role> getRoleByName(@PathVariable String name) {
-        return roleService.getRoleByName(name)
-                .map(role -> new ResponseEntity<>(role, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return new ResponseEntity<>(roleService.getRoleByName(name), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteRoleByName(@PathVariable String name) {
-        roleService.deleteRoleByName(name);
+    @PostMapping("/{userId}/{roleId}")
+    public ResponseEntity<String> addRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
+        roleService.addRoleToUser(userId, roleId);
+        return new ResponseEntity<>("User added to role successfully", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{userId}/{roleId}")
+    public ResponseEntity<String> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
+        roleService.removeRoleFromUser(userId, roleId);
+        return new ResponseEntity<>("Role removed from user successfully", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/users/{roleId}")
+    public ResponseEntity<String> removeAllRolesFromUser(@PathVariable Long roleId) {
+        roleService.removeAllRolesFromUser(roleId);
+        return new ResponseEntity<>("All roles removed from user successfully", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{roleId}")
+    public ResponseEntity<String> deleteRole(@PathVariable Long roleId) {
+        roleService.deleteRole(roleId);
         return new ResponseEntity<>("Role deleted successfully", HttpStatus.OK);
     }
 }
