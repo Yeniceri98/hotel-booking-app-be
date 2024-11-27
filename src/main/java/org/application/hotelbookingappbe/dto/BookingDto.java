@@ -25,5 +25,4 @@ public class BookingDto {
     private Integer numOfChildren;
     private String bookingConfirmationCode;
     private RoomDto room;
-
 }

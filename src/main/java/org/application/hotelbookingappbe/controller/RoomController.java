@@ -2,7 +2,6 @@ package org.application.hotelbookingappbe.controller;
 
 import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.service.RoomService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

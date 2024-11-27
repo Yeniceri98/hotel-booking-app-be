@@ -20,5 +20,4 @@ public class JwtResponse {
         this.token = token;
         this.roles = roles;
     }
-
 }
