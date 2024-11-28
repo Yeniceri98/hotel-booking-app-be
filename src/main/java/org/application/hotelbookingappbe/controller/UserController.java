@@ -15,11 +15,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        return new ResponseEntity<>(userService.registerUser(user), HttpStatus.CREATED);
-    }
-
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
