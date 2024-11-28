@@ -19,10 +19,10 @@ import java.util.List;
 public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    @Value("${security.jwt.secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${security.jwt.expirationTimeMs}")
+    @Value("${jwt.expirationTimeMs}")
     private int expirationTimeMs = 86400000;
 
     public String generateJwtToken(Authentication authentication) {
@@ -35,7 +35,7 @@ public class JwtService {
                 .claim("roles", roles)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))
-                .signWith(signingKey(), SignatureAlgorithm.ES256)
+                .signWith(signingKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
