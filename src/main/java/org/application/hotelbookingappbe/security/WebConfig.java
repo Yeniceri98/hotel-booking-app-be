@@ -35,13 +35,12 @@ public class WebConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**").permitAll()
-                        .anyRequest().permitAll().requestMatchers("/roles/**").hasRole("ADMIN")
+                        .requestMatchers("/roles/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
