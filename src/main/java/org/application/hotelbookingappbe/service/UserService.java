@@ -26,7 +26,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(User user) {
+    public User register(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail() + " is already exists");
         }
