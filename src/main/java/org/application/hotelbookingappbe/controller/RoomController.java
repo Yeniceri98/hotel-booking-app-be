@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,7 @@ public class RoomController {
     }
 
     @PostMapping("/add-room")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomDto> addRoom(
             @RequestParam(value = "photo", required = false) MultipartFile photo,
             @RequestParam("roomType") String roomType,
@@ -74,6 +76,7 @@ public class RoomController {
     }
 
     @PutMapping("/room/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomDto> updateRoom(
             @PathVariable Long roomId,
             @RequestParam("roomType") String roomType,
@@ -84,6 +87,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/delete-room/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
         roomService.deleteRoom(roomId);
         return new ResponseEntity<>("Room deleted successfully", HttpStatus.OK);

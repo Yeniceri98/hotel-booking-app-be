@@ -4,6 +4,7 @@ import org.application.hotelbookingappbe.dto.BookingDto;
 import org.application.hotelbookingappbe.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class BookingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<BookingDto>> getAllBookings() {
         return new ResponseEntity<>(bookingService.getAllBookings(), HttpStatus.OK);
     }
