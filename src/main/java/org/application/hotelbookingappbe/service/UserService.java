@@ -32,8 +32,16 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Optional<Role> userRole = roleRepository.findByName("ROLE_USER");
-        user.setRoles(Collections.singletonList(userRole.get()));
+
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setName("ROLE_USER");
+                    return roleRepository.save(newRole);
+                });
+
+        user.setRoles(Collections.singletonList(userRole));
+
         return userRepository.save(user);
     }
 
