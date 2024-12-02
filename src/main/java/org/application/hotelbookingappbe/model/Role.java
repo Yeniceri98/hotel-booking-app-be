@@ -21,7 +21,6 @@ public class Role {
 
     private String name;
 
-    @JsonBackReference  // This annotation is used to prevent infinite recursion when serializing the Role object to JSON (Back part of the relationship)
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users = new HashSet<>();
 

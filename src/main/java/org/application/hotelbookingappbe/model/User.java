@@ -23,7 +23,6 @@ public class User {
     private String email;
     private String password;
 
-    @JsonManagedReference   // This annotation is used to prevent infinite recursion when serializing the User object to JSON (Forward part of the relationship)
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
             name = "users_roles",
