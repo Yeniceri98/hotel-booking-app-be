@@ -15,7 +15,7 @@ import java.util.List;
 public class RoleController {
     private final RoleService roleService;
 
-    @PostMapping
+    @PostMapping("/create-role")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
@@ -30,25 +30,25 @@ public class RoleController {
         return new ResponseEntity<>(roleService.getRoleByName(name), HttpStatus.OK);
     }
 
-    @PostMapping("/{userId}/{roleId}")
+    @PostMapping("/add-role-to-user/{userId}/{roleId}")
     public ResponseEntity<String> addRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.addRoleToUser(userId, roleId);
         return new ResponseEntity<>("User added to role successfully", HttpStatus.OK);
     }
 
-    @DeleteMapping("/{userId}/{roleId}")
+    @DeleteMapping("/delete-role-from-user/{userId}/{roleId}")
     public ResponseEntity<String> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.removeRoleFromUser(userId, roleId);
         return new ResponseEntity<>("Role removed from user successfully", HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/{roleId}")
+    @DeleteMapping("/delete-all-roles-from-user/{roleId}")
     public ResponseEntity<String> removeAllRolesFromUser(@PathVariable Long roleId) {
         roleService.removeAllRolesFromUser(roleId);
         return new ResponseEntity<>("All roles removed from user successfully", HttpStatus.OK);
     }
 
-    @DeleteMapping("/{roleId}")
+    @DeleteMapping("/delete-role/{roleId}")
     public ResponseEntity<String> deleteRole(@PathVariable Long roleId) {
         roleService.deleteRole(roleId);
         return new ResponseEntity<>("Role deleted successfully", HttpStatus.OK);
