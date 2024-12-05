@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,6 @@ public class User {
     private String email;
     private String password;
 
-    @JsonIgnoreProperties("users")  // Infinite loop fix
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
             name = "users_roles",
