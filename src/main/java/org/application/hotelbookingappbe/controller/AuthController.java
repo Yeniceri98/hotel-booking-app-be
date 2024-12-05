@@ -44,12 +44,14 @@ public class AuthController {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtService.generateJwtToken(authentication);
+        String jwtToken = jwtService.generateJwtToken(authentication);
+
         HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-        return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwt, roles));
+
+        return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
     }
 }
