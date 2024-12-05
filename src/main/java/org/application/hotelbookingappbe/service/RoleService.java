@@ -33,10 +33,6 @@ public class RoleService {
         return roleRepository.findAll();
     }
 
-    public Role getRoleByName(String name) {
-        return roleRepository.findByName(name).orElseThrow(() -> new RoleNotFoundException("Role not found"));
-    }
-
     public void addRoleToUser(Long userId, Long roleId) {
         Role role = roleRepository.findById(roleId).orElseThrow(() -> new RoleNotFoundException("Role not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));

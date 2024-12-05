@@ -25,11 +25,6 @@ public class RoleController {
         return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Role> getRoleByName(@PathVariable String name) {
-        return new ResponseEntity<>(roleService.getRoleByName(name), HttpStatus.OK);
-    }
-
     @PostMapping("/add-role-to-user/{userId}/{roleId}")
     public ResponseEntity<String> addRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.addRoleToUser(userId, roleId);
