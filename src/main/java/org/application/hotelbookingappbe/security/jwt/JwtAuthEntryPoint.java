@@ -21,19 +21,36 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+                         AuthenticationException authException) throws IOException {
         logger.error("Unauthorized error: {}", authException.getMessage());
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        // Check if the error is due to "User not found" scenario
+        String errorMessage = authException.getMessage();
+        if (errorMessage.contains("User not found")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+            final Map<String, Object> body = new HashMap<>();
+            body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+            body.put("error", "Unauthorized");
+            body.put("message", errorMessage);
+            body.put("path", request.getServletPath());
 
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getOutputStream(), body);
+        } else {
+            // Default handling for other cases
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            final Map<String, Object> body = new HashMap<>();
+            body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+            body.put("error", "Unauthorized");
+            body.put("message", authException.getMessage());
+            body.put("path", request.getServletPath());
+
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getOutputStream(), body);
+        }
     }
 }
