@@ -31,7 +31,7 @@ public class RoleController {
         return new ResponseEntity<>("User added to role successfully", HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete-role-from-user/{userId}/{roleId}")
+    @DeleteMapping("/remove-role-from-user/{userId}/{roleId}")
     public ResponseEntity<String> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.removeRoleFromUser(userId, roleId);
         return new ResponseEntity<>("Role removed from user successfully", HttpStatus.OK);
