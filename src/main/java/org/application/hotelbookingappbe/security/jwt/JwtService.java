@@ -3,6 +3,9 @@ package org.application.hotelbookingappbe.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.application.hotelbookingappbe.model.BlacklistedToken;
+import org.application.hotelbookingappbe.repository.BlacklistedTokenRepository;
 import org.application.hotelbookingappbe.security.user.HotelUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +19,10 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+    private final BlacklistedTokenRepository blackListedTokenRepository;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -39,11 +44,6 @@ public class JwtService {
                 .compact();
     }
 
-    private SecretKey signingKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
     public String getUsernameFromJwtToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey())
@@ -55,6 +55,9 @@ public class JwtService {
 
     public Boolean validateJwtToken(String token) {
         try {
+            if (blackListedTokenRepository.existsByToken(token)) {
+                return false;
+            }
             Jwts.parserBuilder()
                     .setSigningKey(signingKey())
                     .build()
@@ -72,5 +75,17 @@ public class JwtService {
             logger.error("JWT token is invalid: {}", e.getMessage());
         }
         return false;
+    }
+
+    // Logout
+    public void invalidateToken(String token) {
+        BlacklistedToken blacklistedToken = new BlacklistedToken();
+        blacklistedToken.setToken(token);
+        blackListedTokenRepository.save(blacklistedToken);
+    }
+
+    private SecretKey signingKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
