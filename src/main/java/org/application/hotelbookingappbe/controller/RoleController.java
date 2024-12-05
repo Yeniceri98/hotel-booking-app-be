@@ -15,14 +15,14 @@ import java.util.List;
 public class RoleController {
     private final RoleService roleService;
 
-    @PostMapping("/create-role")
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
-    }
-
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
         return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
+    }
+
+    @PostMapping("/create-role")
+    public ResponseEntity<Role> createRole(@RequestBody Role role) {
+        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
 
     @PostMapping("/add-role-to-user/{userId}/{roleId}")
@@ -35,12 +35,6 @@ public class RoleController {
     public ResponseEntity<String> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.removeRoleFromUser(userId, roleId);
         return new ResponseEntity<>("Role removed from user successfully", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/delete-all-roles-from-user/{roleId}")
-    public ResponseEntity<String> removeAllRolesFromUser(@PathVariable Long roleId) {
-        roleService.removeAllRolesFromUser(roleId);
-        return new ResponseEntity<>("All roles removed from user successfully", HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-role/{roleId}")
