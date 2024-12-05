@@ -2,11 +2,11 @@ package org.application.hotelbookingappbe.service;
 
 import jakarta.transaction.Transactional;
 import org.application.hotelbookingappbe.exception.UserAlreadyExistsException;
-import org.application.hotelbookingappbe.exception.UserNotFoundException;
 import org.application.hotelbookingappbe.model.Role;
 import org.application.hotelbookingappbe.model.User;
 import org.application.hotelbookingappbe.repository.RoleRepository;
 import org.application.hotelbookingappbe.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +49,12 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     @Transactional
     public void deleteUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         userRepository.delete(user);
     }
 }
