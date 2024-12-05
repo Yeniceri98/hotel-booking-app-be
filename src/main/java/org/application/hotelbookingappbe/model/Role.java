@@ -1,6 +1,7 @@
 package org.application.hotelbookingappbe.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class Role {
 
     private String name;
 
+    @JsonIgnoreProperties("roles")  // Infinite loop fix
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users = new HashSet<>();
 
