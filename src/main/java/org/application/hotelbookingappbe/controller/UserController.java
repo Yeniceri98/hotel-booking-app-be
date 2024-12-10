@@ -22,16 +22,16 @@ public class UserController {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        return new ResponseEntity<>(userService.getUserByEmail(email), HttpStatus.OK);
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+        return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{email}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and #email == principal.username)")
-    public ResponseEntity<String> deleteUserByEmail(@PathVariable String email) {
-        userService.deleteUserByEmail(email);
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and @userService.isOwner(#userId, principal.username))")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 }
