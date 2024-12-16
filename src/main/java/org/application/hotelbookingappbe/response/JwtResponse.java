@@ -10,7 +10,7 @@ import java.util.List;
 public class JwtResponse {
     private Long id;
     private String email;
-    private String token;
+    private String token;   // Token value comes from here
     private String type = "Bearer";
     private List<String> roles;
 

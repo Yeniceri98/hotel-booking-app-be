@@ -18,7 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class JwtAuthFilter extends OncePerRequestFilter {
+// Gelen istekleri kontrol eden class
+public class JwtAuthFilter extends OncePerRequestFilter {   // Her HTTP isteği için yalnızca bir kez çalıştırılan özel bir filtre
     @Autowired
     private JwtService jwtService;
 
@@ -27,12 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
+    // Gelen her HTTP isteği için çağrılan OncePerRequestFilter'a ait metod
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
 
-            if (jwt != null && jwtService.validateJwtToken(jwt)) {
+            if (jwt != null && jwtService.validateJwtToken(jwt)) {              // JWT token doğrulaması
                 String username = jwtService.getUsernameFromJwtToken(jwt);
 
                 try {
@@ -41,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             userDetails, null, userDetails.getAuthorities()
                     );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);   // JWT doğrulaması başarılı ise kullanıcının kimlik doğrulaması yapılmış olur
                 } catch (UsernameNotFoundException ex) {
                     logger.error("User not found with email: {}", username);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -57,11 +59,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // İlgili istek içerisindeki JWT'yi parse etme
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
 
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);
+            return headerAuth.substring(7);     // EXP: Bearer 12301231231231230913
         }
 
         return null;

@@ -33,12 +33,15 @@ public class WebConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(jwtAuthEntryPoint))
+
+                // Authorization
                 .authorizeHttpRequests(x -> x
-                        .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**").permitAll()   // No auth required
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))   // No session holding. All requests are independent
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -74,9 +77,8 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedMethods("*")
+                        .allowedHeaders("*");
             }
         };
     }

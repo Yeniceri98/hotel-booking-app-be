@@ -21,6 +21,7 @@ public class HotelUserDetails implements UserDetails {
     private String password;
     private List<GrantedAuthority> authorities;
 
+    // Returning User object as UserDetails object
     public static HotelUserDetails build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(
                 role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList()

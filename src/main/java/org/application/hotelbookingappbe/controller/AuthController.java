@@ -41,7 +41,7 @@ public class AuthController {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwtToken = jwtService.generateJwtToken(authentication);
+        String jwtToken = jwtService.generateJwtToken(authentication);      // Generating JWT token
 
         HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities()
@@ -49,6 +49,7 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        // Returning the JWT token and user details in the response
         return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
     }
 
@@ -56,7 +57,7 @@ public class AuthController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            jwtService.invalidateToken(token);
+            jwtService.invalidateToken(token);      // Invalidate the token
             SecurityContextHolder.clearContext();
             return ResponseEntity.ok("Logged out successfully");
         }

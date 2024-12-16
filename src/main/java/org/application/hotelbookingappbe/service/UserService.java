@@ -30,8 +30,10 @@ public class UserService {
             throw new UserAlreadyExistsException(user.getEmail() + " is already exists");
         }
 
+        // Encoding the password before saving it to the database
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        // Creating a ROLE_USER as default role when registering a new user
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseGet(() -> {
                     Role newRole = new Role();
