@@ -25,22 +25,24 @@ public class JwtService {
     private final BlacklistedTokenRepository blackListedTokenRepository;
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret;                      // JWT token oluşturma ve doğrulama işlemleri için kullanılır
 
     @Value("${jwt.expirationTimeMs}")
-    private int expirationTimeMs = 86400000;
+    private int expirationTimeMs = 86400000;    // Token expiration time in milliseconds (1 day)
 
+    // Key part for JWT
     public String generateJwtToken(Authentication authentication) {
-        HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();
-        List<String> roles = userPrincipal.getAuthorities()
+        HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();      // Kullanıcı bilgilerini alma
+        List<String> roles = userPrincipal.getAuthorities()                                     // Kullanıcı rollerini alma
                 .stream()
                 .map(GrantedAuthority::getAuthority).toList();
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim("roles", roles)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))
-                .signWith(signingKey(), SignatureAlgorithm.HS256)
+                .claim("id", userPrincipal.getId())                                         // Kullanıcının ID'si
+                .claim("roles", roles)                                                      // Kullanıcının sahip olduğu rollerin listesi
+                .setIssuedAt(new Date(System.currentTimeMillis()))                          // Token'ın oluşturulduğu tarih
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))     // Token'ın süresi
+                .signWith(signingKey(), SignatureAlgorithm.HS256)                           // JWT'yi gizli anahtar ve HMAC SHA256 algoritmasıyla imzalayarak güvence altına alma
                 .compact();
     }
 
@@ -85,7 +87,7 @@ public class JwtService {
     }
 
     private SecretKey signingKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);   // Decode the secret key from Base64
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
