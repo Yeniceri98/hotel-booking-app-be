@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Auth Controller", description = "Authentication API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -27,12 +29,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+    @Tag(name = "Register User")
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
         userService.register(user);
         return new ResponseEntity<>("Registration successful", HttpStatus.CREATED);
     }
 
+    @Tag(name = "Login User")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -53,6 +57,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
     }
 
+    @Tag(name = "Logout User")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

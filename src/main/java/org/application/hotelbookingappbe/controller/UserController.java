@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
 import org.application.hotelbookingappbe.service.UserService;
@@ -10,24 +11,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "User Controller", description = "User API")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
+    @Tag(name = "Get All Users")
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
+    @Tag(name = "Get User By Id")
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
+    @Tag(name = "Delete User")
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or (hasRole('ROLE_USER') and @userService.isOwner(#userId, principal.username))")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {

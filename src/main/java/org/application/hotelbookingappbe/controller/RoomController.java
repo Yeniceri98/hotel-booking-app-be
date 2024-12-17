@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.service.RoomService;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Tag(name = "Room Controller", description = "Room API")
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
@@ -27,6 +29,7 @@ public class RoomController {
         this.roomService = roomService;
     }
 
+    @Tag(name = "Add Room")
     @PostMapping("/add-room")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomDto> addRoom(
@@ -37,21 +40,25 @@ public class RoomController {
         return new ResponseEntity<>(roomService.addRoom(photo, roomType, roomPrice), HttpStatus.CREATED);
     }
 
+    @Tag(name = "Get Room Types")
     @GetMapping("/room-types")
     public ResponseEntity<List<String>> getRoomTypes() {
         return new ResponseEntity<>(roomService.getRoomTypes(), HttpStatus.OK);
     }
 
+    @Tag(name = "Get Room By Id")
     @GetMapping("/room/{roomId}")
     public ResponseEntity<RoomDto> getRoomById(@PathVariable Long roomId) {
         return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
     }
 
+    @Tag(name = "Get All Rooms")
     @GetMapping("/all-rooms")
     public ResponseEntity<List<RoomDto>> getAllRooms() {
         return new ResponseEntity<>(roomService.getAllRooms(), HttpStatus.OK);
     }
 
+    @Tag(name = "Get Room Photo By Room Id")
     @GetMapping("/room-photo/{roomId}")
     public ResponseEntity<byte[]> getRoomPhotoByRoomId(@PathVariable Long roomId) {
         byte[] photo = roomService.getRoomPhotoByRoomId(roomId);
@@ -66,6 +73,7 @@ public class RoomController {
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
     }
 
+    @Tag(name = "Get Available Rooms")
     @GetMapping("/available-rooms")
     public ResponseEntity<List<RoomDto>> getAvailableRooms(
             @RequestParam("checkInDate") LocalDate checkInDate,
@@ -75,6 +83,7 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getAvailableRooms(checkInDate, checkOutDate, roomType), HttpStatus.OK);
     }
 
+    @Tag(name = "Update Room")
     @PutMapping("/room/{roomId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomDto> updateRoom(
@@ -86,6 +95,7 @@ public class RoomController {
         return new ResponseEntity<>(roomService.updateRoom(roomId, roomType, roomPrice, photo), HttpStatus.OK);
     }
 
+    @Tag(name = "Delete Room")
     @DeleteMapping("/delete-room/{roomId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {

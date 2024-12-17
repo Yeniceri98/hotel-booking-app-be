@@ -39,7 +39,14 @@ public class WebConfig {
 
                 // Authorization
                 .authorizeHttpRequests(x -> x
-                        .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**").permitAll()   // No auth required
+                        .requestMatchers("/api/auth/**",
+                                "/api/rooms/**",
+                                "/api/bookings/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**").permitAll()   // No auth required
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
