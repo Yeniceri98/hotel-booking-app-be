@@ -1,6 +1,7 @@
 package org.application.hotelbookingappbe.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.application.hotelbookingappbe.dto.BookingDto;
 import org.application.hotelbookingappbe.service.BookingService;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class BookingController {
 
     @Tag(name = "Add Booking")
     @PostMapping("/add-booking/{roomId}")
-    public ResponseEntity<BookingDto> addBooking(@PathVariable Long roomId, @RequestBody BookingDto bookingDto) {
+    public ResponseEntity<BookingDto> addBooking(@PathVariable Long roomId, @Valid @RequestBody BookingDto bookingDto) {
         return new ResponseEntity<>(bookingService.addBooking(roomId, bookingDto), HttpStatus.CREATED);
     }
 

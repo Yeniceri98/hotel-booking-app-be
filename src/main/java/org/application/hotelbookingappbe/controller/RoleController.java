@@ -1,6 +1,7 @@
 package org.application.hotelbookingappbe.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.Role;
 import org.application.hotelbookingappbe.service.RoleService;
@@ -25,7 +26,7 @@ public class RoleController {
 
     @Tag(name = "Create Role")
     @PostMapping("/create-role")
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
+    public ResponseEntity<Role> createRole(@Valid @RequestBody Role role) {
         return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
 
