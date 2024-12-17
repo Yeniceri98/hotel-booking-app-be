@@ -1,6 +1,7 @@
 package org.application.hotelbookingappbe.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
 import org.application.hotelbookingappbe.service.UserService;
@@ -30,6 +31,13 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
+    }
+
+    @Tag(name = "Update User")
+    @PutMapping("/{userId}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') and @userService.isOwner(#userId, principal.username)")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody User user) {
+        return new ResponseEntity<>(userService.updateUser(userId, user), HttpStatus.OK);
     }
 
     @Tag(name = "Delete User")

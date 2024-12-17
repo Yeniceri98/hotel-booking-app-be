@@ -55,6 +55,15 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
     }
 
+    public User updateUser(Long userId, User user) {
+        User existingUser = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(existingUser);
+    }
+
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
@@ -66,4 +75,6 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
         return user.getEmail().equals(username);
     }
+
+
 }
