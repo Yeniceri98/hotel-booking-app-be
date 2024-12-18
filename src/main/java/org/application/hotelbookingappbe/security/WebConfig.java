@@ -57,6 +57,7 @@ public class WebConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
     }
+
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter();
