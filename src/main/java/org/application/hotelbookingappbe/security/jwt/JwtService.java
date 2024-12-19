@@ -36,11 +36,11 @@ public class JwtService {
                 .stream()
                 .map(GrantedAuthority::getAuthority).toList();
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .claim("id", userPrincipal.getId())                                      // ID of the user
-                .claim("roles", roles)                                                   // Roles that user has
-                .setIssuedAt(new Date(System.currentTimeMillis()))                       // Token issued time
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))  // Token expiration time
+                .setSubject(userPrincipal.getUsername())                                 // Adding username to the "subject" part of the JWT
+                .claim("id", userPrincipal.getId())                                      // Adding user ID to the JWT
+                .claim("roles", roles)                                                   // Adding user roles to the JWT
+                .setIssuedAt(new Date(System.currentTimeMillis()))                       // Setting the token's creation time
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))  // Setting the token's expiration time
                 .signWith(signingKey(), SignatureAlgorithm.HS256)                        // Signing key and algorithm
                 .compact();
     }
