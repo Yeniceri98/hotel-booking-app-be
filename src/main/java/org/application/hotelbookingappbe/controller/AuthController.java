@@ -53,7 +53,7 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        // Returning the JWT token and user details in the response
+        // Returning the JWT token and user details from the Login response
         return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
     }
 
