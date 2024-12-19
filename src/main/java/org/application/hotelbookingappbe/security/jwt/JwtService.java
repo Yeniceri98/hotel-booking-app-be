@@ -25,24 +25,23 @@ public class JwtService {
     private final BlacklistedTokenRepository blackListedTokenRepository;
 
     @Value("${jwt.secret}")
-    private String secret;                      // JWT token oluşturma ve doğrulama işlemleri için kullanılır
+    private String secret;                      // Need for JWT token generation
 
     @Value("${jwt.expirationTimeMs}")
     private int expirationTimeMs = 86400000;    // Token expiration time in milliseconds (1 day)
 
-    // Key part for JWT
     public String generateJwtToken(Authentication authentication) {
-        HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();      // Kullanıcı bilgilerini alma
-        List<String> roles = userPrincipal.getAuthorities()                                     // Kullanıcı rollerini alma
+        HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();      // Getting user details
+        List<String> roles = userPrincipal.getAuthorities()                                     // Getting user roles
                 .stream()
                 .map(GrantedAuthority::getAuthority).toList();
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim("id", userPrincipal.getId())                                         // Kullanıcının ID'si
-                .claim("roles", roles)                                                      // Kullanıcının sahip olduğu rollerin listesi
-                .setIssuedAt(new Date(System.currentTimeMillis()))                          // Token'ın oluşturulduğu tarih
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))     // Token'ın süresi
-                .signWith(signingKey(), SignatureAlgorithm.HS256)                           // JWT'yi gizli anahtar ve HMAC SHA256 algoritmasıyla imzalayarak güvence altına alma
+                .claim("id", userPrincipal.getId())                                      // ID of the user
+                .claim("roles", roles)                                                   // Roles that user has
+                .setIssuedAt(new Date(System.currentTimeMillis()))                       // Token issued time
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMs))  // Token expiration time
+                .signWith(signingKey(), SignatureAlgorithm.HS256)                        // Signing key and algorithm
                 .compact();
     }
 

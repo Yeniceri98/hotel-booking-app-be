@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-// Kimlik doğrulama hatalarını işlemek için kullanılan class
+// The class that handles authentication errors
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthEntryPoint.class);
 
-    // AuthenticationException nedeniyle kimlik doğrulama hatası oluştuğunda çağrılan metod
+    // The method that is called when AuthenticationException occurs
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {

@@ -46,7 +46,7 @@ public class WebConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**").permitAll()   // No auth required
+                                "/webjars/**").permitAll()   // No auth required for these endpoints
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

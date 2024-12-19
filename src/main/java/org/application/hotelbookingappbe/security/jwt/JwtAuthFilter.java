@@ -18,8 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// Gelen istekleri kontrol eden class
-public class JwtAuthFilter extends OncePerRequestFilter {   // Her HTTP isteği için yalnızca bir kez çalıştırılan özel bir filtre
+// Class that handles JWT authentication for incoming requests
+public class JwtAuthFilter extends OncePerRequestFilter {   // A filter that is executed once per request
     @Autowired
     private JwtService jwtService;
 
@@ -28,13 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {   // Her HTTP isteği 
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
-    // Gelen her HTTP isteği için çağrılan OncePerRequestFilter'a ait metod
+    // Method belongs to OncePerRequestFilter class that is executed once per request
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
 
-            if (jwt != null && jwtService.validateJwtToken(jwt)) {              // JWT token doğrulaması
+            if (jwt != null && jwtService.validateJwtToken(jwt)) {            // JWT token validation
                 String username = jwtService.getUsernameFromJwtToken(jwt);
 
                 try {
@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {   // Her HTTP isteği 
                             userDetails, null, userDetails.getAuthorities()
                     );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);   // JWT doğrulaması başarılı ise kullanıcının kimlik doğrulaması yapılmış olur
+                    SecurityContextHolder.getContext().setAuthentication(authentication);   // If JWT token is valid, set the authentication in the security context
                 } catch (UsernameNotFoundException ex) {
                     logger.error("User not found with email: {}", username);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -59,7 +59,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {   // Her HTTP isteği 
         filterChain.doFilter(request, response);
     }
 
-    // İlgili istek içerisindeki JWT'yi parse etme
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
 

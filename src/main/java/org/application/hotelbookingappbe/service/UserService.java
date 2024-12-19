@@ -75,6 +75,4 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
         return user.getEmail().equals(username);
     }
-
-
 }
