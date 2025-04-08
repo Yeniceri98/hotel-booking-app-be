@@ -1,4 +1,4 @@
-package org.application.hotelbookingappbe.response;
+package org.application.hotelbookingappbe.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

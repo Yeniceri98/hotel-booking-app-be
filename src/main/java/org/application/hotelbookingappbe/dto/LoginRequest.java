@@ -1,4 +1,4 @@
-package org.application.hotelbookingappbe.request;
+package org.application.hotelbookingappbe.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
