@@ -25,10 +25,10 @@ public class JwtService {
     private final BlacklistedTokenRepository blackListedTokenRepository;
 
     @Value("${jwt.secret}")
-    private String secret;                      // Need for JWT token generation
+    private String secret;                  // Need for JWT token generation
 
     @Value("${jwt.expirationTimeMs}")
-    private int expirationTimeMs = 86400000;    // Token expiration time in milliseconds (1 day)
+    private int expirationTimeMs;           // Token expiration time in milliseconds (1 day)
 
     public String generateJwtToken(Authentication authentication) {
         HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();      // Getting user details
