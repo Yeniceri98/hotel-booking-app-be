@@ -7,14 +7,14 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class JwtResponse {
+public class LoginResponse {
     private Long id;
     private String email;
     private String token;   // Token value comes from here
     private String type = "Bearer";
     private List<String> roles;
 
-    public JwtResponse(Long id, String email, String token, List<String> roles) {
+    public LoginResponse(Long id, String email, String token, List<String> roles) {
         this.id = id;
         this.email = email;
         this.token = token;

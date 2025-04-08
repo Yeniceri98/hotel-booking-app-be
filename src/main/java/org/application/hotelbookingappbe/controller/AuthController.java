@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
 import org.application.hotelbookingappbe.request.LoginRequest;
-import org.application.hotelbookingappbe.response.JwtResponse;
+import org.application.hotelbookingappbe.response.LoginResponse;
 import org.application.hotelbookingappbe.security.jwt.JwtService;
 import org.application.hotelbookingappbe.security.user.HotelUserDetails;
 import org.application.hotelbookingappbe.service.UserService;
@@ -54,7 +54,7 @@ public class AuthController {
                 .toList();
 
         // Returning the JWT token and user details from the Login response
-        return ResponseEntity.ok(new JwtResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
+        return ResponseEntity.ok(new LoginResponse(userDetails.getId(), userDetails.getEmail(), jwtToken, roles));
     }
 
     @Tag(name = "Logout User")
