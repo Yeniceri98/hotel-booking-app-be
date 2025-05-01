@@ -136,6 +136,7 @@ public class BookingServiceTest {
     public void addBooking_shouldCreateAndReturnBookingDto() {
         Long roomId = 1L;
 
+        // NOTE: bookingConfirmationCode ve room fieldları yollanmaz çünkü service'te addBooking() metodu içinde bu değerler otomatik oluşturuluyor
         BookingDto newBookingDto = BookingDto.builder()
                 .checkInDate(LocalDate.parse("2023-07-01"))
                 .checkOutDate(LocalDate.parse("2023-07-05"))
@@ -143,7 +144,6 @@ public class BookingServiceTest {
                 .guestEmail("jane.smith@example.com")
                 .numOfAdults(2)
                 .numOfChildren(0)
-                .bookingConfirmationCode("ABC123")
                 .build();
 
         Room availableRoom = Room.builder()
@@ -162,7 +162,7 @@ public class BookingServiceTest {
                 .guestEmail(newBookingDto.getGuestEmail())
                 .numOfAdults(newBookingDto.getNumOfAdults())
                 .numOfChildren(newBookingDto.getNumOfChildren())
-                .bookingConfirmationCode(newBookingDto.getBookingConfirmationCode())
+                .bookingConfirmationCode("ABC123")
                 .room(availableRoom)
                 .build();
 
