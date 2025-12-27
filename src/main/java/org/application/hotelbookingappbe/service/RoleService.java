@@ -1,5 +1,6 @@
 package org.application.hotelbookingappbe.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.exception.RoleAlreadyExistsException;
 import org.application.hotelbookingappbe.exception.RoleNotFoundException;
@@ -33,6 +34,7 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
+    @Transactional
     public void addRoleToUser(Long userId, Long roleId) {
         Role role = roleRepository.findById(roleId).orElseThrow(() -> new RoleNotFoundException("Role not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));

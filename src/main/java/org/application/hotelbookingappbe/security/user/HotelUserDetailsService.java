@@ -19,3 +19,12 @@ public class HotelUserDetailsService implements UserDetailsService {
         return HotelUserDetails.build(user);
     }
 }
+
+/*
+    Authentication sırasında Spring Security kullanıcıyı buradan ister
+    DB lookup + UserDetails'e mapping burada merkezi yapılır
+
+    Spring Security burada ne zaman çağırır?
+    UsernamePasswordAuthenticationFilter (form login/basic)
+    DaoAuthenticationProvider authenticate() sırasında
+*/

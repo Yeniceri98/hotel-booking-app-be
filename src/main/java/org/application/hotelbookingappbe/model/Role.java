@@ -19,6 +19,10 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /*
+        Convention: ROLE_ prefix Spring Security'de rol için standarttır
+        ÖRN: ROLE_ADMIN, ROLE_USER
+    */
     @NotBlank
     private String name;
 

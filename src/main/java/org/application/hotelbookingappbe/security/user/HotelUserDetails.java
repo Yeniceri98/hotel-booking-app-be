@@ -2,7 +2,6 @@ package org.application.hotelbookingappbe.security.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,15 +12,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class HotelUserDetails implements UserDetails {
-    private Long id;
-    private String email;
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final Long id;
+    private final String email;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
-    // Returning User object as UserDetails object
+    /*
+       Spring Security, "User" entity'sini tanımaz; UserDetails bekler
+       DB'deki role/authority bilgisini GrantedAuthority listesine dönüştürürüz
+       Enabled / Locked gibi security flag'lerini domain modelinden okuruz
+    */
+    // Returning User object as UserDetails object with Factory Method
     public static HotelUserDetails build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(
                 role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList()

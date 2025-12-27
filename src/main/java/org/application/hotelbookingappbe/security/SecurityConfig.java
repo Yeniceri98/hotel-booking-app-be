@@ -28,7 +28,7 @@ import java.util.List;
 @EnableWebMvc
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
-public class WebConfig {
+public class SecurityConfig {
     private final HotelUserDetailsService hotelUserDetailsService;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
 

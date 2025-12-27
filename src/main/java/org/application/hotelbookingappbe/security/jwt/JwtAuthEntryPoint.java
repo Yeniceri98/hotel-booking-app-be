@@ -38,3 +38,9 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {    // The c
         mapper.writeValue(response.getOutputStream(), body);
     }
 }
+
+/*
+    401 handler olarak implemente edilir (401 Error Unauthorized Access)
+    Authentication yok/invalid ise Spring Security default HTML dönebiliyor
+    Biz REST API’de standart JSON 401 dönmek isteriz
+*/
