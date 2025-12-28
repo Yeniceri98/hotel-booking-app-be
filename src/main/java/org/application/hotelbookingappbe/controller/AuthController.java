@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.application.hotelbookingappbe.model.User;
 import org.application.hotelbookingappbe.dto.LoginRequest;
 import org.application.hotelbookingappbe.dto.LoginResponse;
-import org.application.hotelbookingappbe.security.jwt.JwtService;
+import org.application.hotelbookingappbe.security.jwt.JwtUtils;
 import org.application.hotelbookingappbe.security.user.HotelUserDetails;
 import org.application.hotelbookingappbe.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.List;
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final JwtUtils jwtUtils;
 
     @Tag(name = "Register User")
     @PostMapping("/register")
@@ -45,7 +45,7 @@ public class AuthController {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwtToken = jwtService.generateJwtToken(authentication);      // Generating JWT token
+        String jwtToken = jwtUtils.generateJwtToken(authentication);      // Generating JWT token
 
         HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities()
@@ -62,7 +62,7 @@ public class AuthController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            jwtService.invalidateToken(token);      // Invalidate the token
+            jwtUtils.invalidateToken(token);      // Invalidate the token
             SecurityContextHolder.clearContext();
             return ResponseEntity.ok("Logged out successfully");
         }

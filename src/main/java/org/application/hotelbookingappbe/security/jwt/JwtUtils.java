@@ -20,8 +20,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
-    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+public class JwtUtils {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     private final BlacklistedTokenRepository blackListedTokenRepository;
 
     @Value("${jwt.secret}")
