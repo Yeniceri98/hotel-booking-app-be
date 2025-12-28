@@ -5,6 +5,7 @@ import org.application.hotelbookingappbe.exception.RoomIsNotFoundException;
 import org.application.hotelbookingappbe.model.Room;
 import org.application.hotelbookingappbe.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,144 +33,181 @@ public class RoomServiceTest {
     @InjectMocks
     private RoomService roomService;
 
-    private Room room;
-    private RoomDto roomDto;
+    private Room room1;
+    private Room room2;
 
     @BeforeEach
-    public void init() {
-        room = Room.builder()
+    void init() {
+        room1 = Room.builder()
                 .id(1L)
-                .roomType("single room")
-                .roomPrice(BigDecimal.valueOf(100.0))
-                .isBooked(false)
-                .photo(null)
-                .bookings(new ArrayList<>())
+                .roomType("DELUXE")
+                .roomPrice(new BigDecimal("1500.00"))
+                .photo("img1".getBytes())
                 .build();
-        roomDto = RoomDto.builder()
-                .id(1L)
-                .roomType("single room")
-                .roomPrice(BigDecimal.valueOf(100.0))
+
+        room2 = Room.builder()
+                .id(2L)
+                .roomType("STANDARD")
+                .roomPrice(new BigDecimal("500.00"))
+                .photo("img2".getBytes())
                 .build();
     }
 
     @Test
-    public void addRoom_shouldReturnRoomDto() throws IOException {
-        // Given
+    void addRoom_whenPhotoProvided_shouldSaveWithBytes() throws IOException {
         MultipartFile photo = mock(MultipartFile.class);
-        when(roomRepository.save(any(Room.class))).thenReturn(room);
 
-        // When
-        RoomDto savedRoomDto = roomService.addRoom(photo, "single room", BigDecimal.valueOf(100.0));
+        when(photo.getBytes()).thenReturn("photo-bytes".getBytes());
 
-        // Then
-        assertNotNull(savedRoomDto);
-        assertEquals(roomDto.getId(), savedRoomDto.getId());
-        assertEquals(roomDto.getRoomType(), savedRoomDto.getRoomType());
-        assertEquals(roomDto.getRoomPrice(), savedRoomDto.getRoomPrice());
+        when(roomRepository.save(any(Room.class))).thenAnswer(invocation -> {
+            Room toSave = invocation.getArgument(0);
+            toSave.setId(11L);
+            return toSave;
+        });
+
+        RoomDto result = roomService.addRoom(photo, "DELUXE", new BigDecimal("1500.00"));
+
+        assertEquals(11L, result.getId());
+        verify(roomRepository).save(any(Room.class));
+    }
+
+    @Test
+    void addRoom_whenPhotoNull_shouldSaveWithNullPhoto() throws IOException {
+        when(roomRepository.save(any(Room.class))).thenAnswer(invocation -> {
+            Room toSave = invocation.getArgument(0);
+            toSave.setId(10L);
+            return toSave;
+        });
+
+        RoomDto result = roomService.addRoom(null, "DELUXE", new BigDecimal("1500.00"));
+
+        assertEquals(10L, result.getId());
+        assertEquals("DELUXE", result.getRoomType());
+
         verify(roomRepository).save(any(Room.class));
     }
 
     @Test
     public void getRoomTypes_shouldReturnListOfRoomTypes() {
-        // Given
-        List<String> roomTypes = List.of("single room", "double room");
+        List<String> roomTypes = List.of("DELUXE", "STANDARD");
         when(roomRepository.findDistinctRoomTypes()).thenReturn(roomTypes);
 
-        // When
         List<String> result = roomService.getRoomTypes();
 
-        // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertTrue(result.contains("single room"));
-        assertTrue(result.contains("double room"));
-        verify(roomRepository, times(1)).findDistinctRoomTypes();
+        assertTrue(result.contains("DELUXE"));
+        assertTrue(result.contains("STANDARD"));
+
+        verify(roomRepository).findDistinctRoomTypes();
     }
 
     @Test
-    public void getAllRooms_shouldReturnListOfRoomDto() {
-        when(roomRepository.findAll()).thenReturn(List.of(room));
+    void getAllRooms_shouldReturnMappedDtos() {
+        when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
 
         List<RoomDto> result = roomService.getAllRooms();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(room.getRoomType(), result.get(0).getRoomType());
-        verify(roomRepository, times(1)).findAll();
+        assertEquals(2, result.size());
+        assertEquals("DELUXE", result.get(0).getRoomType());
+        assertEquals("STANDARD", result.get(1).getRoomType());
+
+        verify(roomRepository).findAll();
     }
 
     @Test
-    public void getRoomById_shouldReturnRoomDto() {
-        when(roomRepository.findById(room.getId())).thenReturn(Optional.ofNullable(room));
+    void getRoomById_whenFound_shouldReturnDto() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room1));
 
-        RoomDto result = roomService.getRoomById(room.getId());
+        RoomDto dto = roomService.getRoomById(1L);
 
-        assertNotNull(result);
-        assertEquals(room.getId(), result.getId());
-        assertEquals(room.getRoomType(), result.getRoomType());
-        verify(roomRepository, times(1)).findById(room.getId());
+        assertEquals(1L, dto.getId());
+        assertEquals("DELUXE", dto.getRoomType());
+        verify(roomRepository).findById(1L);
     }
 
     @Test
-    public void getRoomByIdNotFound_shouldReturnException() {
-        when(roomRepository.findById(room.getId())).thenReturn(Optional.empty());   // Simulate not found
+    void getRoomById_whenNotFound_shouldThrowRoomIsNotFoundException() {
+        when(roomRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RoomIsNotFoundException.class, () -> {
-            roomService.getRoomById(room.getId());
-        });
+        assertThrows(
+                RoomIsNotFoundException.class,
+                () -> roomService.getRoomById(99L)
+        );
 
-        verify(roomRepository, times(1)).findById(room.getId());
+        verify(roomRepository).findById(99L);
     }
 
     @Test
-    public void getRoomPhotoByRoomId_shouldReturnRoomPhoto() {
-        byte[] photoData = new byte[]{1, 2, 3};
-        room.setPhoto(photoData);
-        when(roomRepository.findById(room.getId())).thenReturn(Optional.ofNullable(room));
+    void getRoomPhotoByRoomId_shouldReturnBytes() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room1));
 
-        byte[] result = roomService.getRoomPhotoByRoomId(room.getId());
+        byte[] result = roomService.getRoomPhotoByRoomId(1L);
 
-        assertNotNull(result);
-        assertArrayEquals(photoData, result);
-        verify(roomRepository, times(1)).findById(room.getId());
+        assertArrayEquals("img1".getBytes(), result);
+        verify(roomRepository).findById(1L);
     }
 
     @Test
-    public void getAvailableRooms_shouldReturnListOfRoomDto() {
-        List<Room> bookedRooms = List.of(room);
-        List<Room> allRooms = List.of(room);
-        when(roomRepository.findBookedRoomsInDateRange(any(), any(), any())).thenReturn(bookedRooms);
-        when(roomRepository.findByRoomType("single room")).thenReturn(allRooms);
+    void getAvailableRooms_shouldReturnRoomsNotInBookedRooms() {
+        LocalDate in = LocalDate.of(2026, 1, 10);
+        LocalDate out = LocalDate.of(2026, 1, 12);
 
-        List<RoomDto> availableRooms = roomService.getAvailableRooms(null, null, "single room");
+        // bookedRoomsInDateRange -> room1 booked
+        when(roomRepository.findBookedRoomsInDateRange(in, out, "DELUXE")).thenReturn(List.of(room1));
 
-        assertNotNull(availableRooms);
-        assertTrue(availableRooms.isEmpty());
-        verify(roomRepository, times(1)).findBookedRoomsInDateRange(any(), any(), any());
-        verify(roomRepository, times(1)).findByRoomType("single room");
+        // all rooms of type -> room1 + room2
+        when(roomRepository.findByRoomType("DELUXE")).thenReturn(List.of(room1, room2));
+
+        List<RoomDto> available = roomService.getAvailableRooms(in, out, "DELUXE");
+
+        // room1 booked -> sadece room2 kalmalı
+        assertEquals(1, available.size());
+        assertEquals(2L, available.get(0).getId());
+
+        verify(roomRepository).findBookedRoomsInDateRange(in, out, "DELUXE");
+        verify(roomRepository).findByRoomType("DELUXE");
     }
 
     @Test
-    public void updateRoom_shouldReturnUpdatedRoomDto() throws IOException {
+    void updateRoom_whenFoundAndPhotoProvided_shouldUpdateAndSave() throws IOException {
         MultipartFile photo = mock(MultipartFile.class);
-        when(roomRepository.findById(room.getId())).thenReturn(Optional.ofNullable(room));
-        when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(photo.getBytes()).thenReturn("new-photo".getBytes());
 
-        RoomDto updatedRoom = roomService.updateRoom(room.getId(), "double suit", BigDecimal.valueOf(150.0), photo);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room1));
+        when(roomRepository.save(any(Room.class))).thenReturn(room1);
 
-        assertNotNull(updatedRoom);
-        assertEquals(1L, updatedRoom.getId());
-        assertEquals("double suit", updatedRoom.getRoomType());
-        assertEquals(BigDecimal.valueOf(150.0), updatedRoom.getRoomPrice());
-        verify(roomRepository, times(1)).save(any(Room.class));
+        RoomDto updated = roomService.updateRoom(1L, "DELUXE", new BigDecimal("1600.00"), photo);
+
+        assertEquals(1L, updated.getId());
+        assertEquals(new BigDecimal("1600.00"), updated.getRoomPrice());
+
+        verify(roomRepository).findById(1L);
+        verify(roomRepository).save(any(Room.class));
     }
 
     @Test
-    public void deleteRoom_shouldDeleteExistingRoom() {
-        when(roomRepository.findById(room.getId())).thenReturn(Optional.ofNullable(room));
+    void deleteRoom_whenFound_shouldDelete() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room1));
 
-        roomService.deleteRoom(room.getId());
+        doNothing().when(roomRepository).delete(room1);
 
-        verify(roomRepository, times(1)).delete(room);
+        roomService.deleteRoom(1L);
+
+        verify(roomRepository).findById(1L);
+        verify(roomRepository).delete(room1);
+    }
+
+    @Test
+    void deleteRoom_whenNotFound_shouldThrowRoomIsNotFoundException() {
+        when(roomRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                RoomIsNotFoundException.class,
+                () -> roomService.deleteRoom(99L)
+        );
+
+        verify(roomRepository).findById(99L);
+        verify(roomRepository, never()).delete(any());
     }
 }
