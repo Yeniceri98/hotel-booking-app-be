@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class BookingDto {
     private Long bookingId;
 
-    @NotNull(message = "Check-out date is required")
+    @NotNull(message = "Check-in date is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate checkInDate;
 
