@@ -1,7 +1,6 @@
 package org.application.hotelbookingappbe.service;
 
 import org.application.hotelbookingappbe.dto.BookingDto;
-import org.application.hotelbookingappbe.dto.RoomDto;
 import org.application.hotelbookingappbe.exception.BookingIsNotFoundException;
 import org.application.hotelbookingappbe.exception.InvalidBookingRequestException;
 import org.application.hotelbookingappbe.exception.RoomIsNotAvailableException;
@@ -18,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,245 +26,264 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
 
+    /*
+        @Mock:
+        BookingService'in ihtiyaç duyduğu bağımlılıkları mock etmek için kullanılır
+        Bu anotasyon sayesinde BookingRepository ve RoomService mocklanmış olur
+        Çünkü Unit Test'te gerçek DB/Repository davranışı istemiyoruz
+    */
     @Mock
     private BookingRepository bookingRepository;
 
     @Mock
     private RoomService roomService;
 
+    /*
+        @InjectMocks:
+        Test etmek istenilen class için kullanılır
+        Mockito, yukarıdaki mockları (repo/service) constructor'a enjekte eder
+    */
     @InjectMocks
     private BookingService bookingService;
 
-    private Booking booking;
-    private BookingDto bookingDto;
+    private Booking booking1;
+    private Booking booking2;
     private Room room;
-    private RoomDto roomDto;
 
     @BeforeEach
-    public void init() {
-        booking = Booking.builder()
-                .bookingId(1L)
-                .checkInDate(LocalDate.parse("2023-06-01"))
-                .checkOutDate(LocalDate.parse("2023-06-05"))
-                .guestName("John Doe")
-                .guestEmail("john.doe@example.com")
-                .numOfAdults(1)
-                .numOfChildren(1)
-                .bookingConfirmationCode("ABC12")
-                .room(room)
-                .build();
-        bookingDto = BookingDto.builder()
-                .bookingId(1L)
-                .checkInDate(LocalDate.parse("2023-06-01"))
-                .checkOutDate(LocalDate.parse("2023-06-05"))
-                .guestName("John Doe")
-                .guestEmail("john.doe@example.com")
-                .numOfAdults(1)
-                .numOfChildren(1)
-                .bookingConfirmationCode("ABC12")
-                .room(roomDto)
-                .build();
+    void init() {
         room = Room.builder()
-                .id(1L)
-                .roomType("single room")
-                .roomPrice(BigDecimal.valueOf(100.0))
-                .isBooked(false)
-                .photo(null)
+                .id(10L)
+                .roomType("DELUXE")
+                .roomPrice(new BigDecimal("1500.00"))
                 .bookings(new ArrayList<>())
                 .build();
-        roomDto = RoomDto.builder()
-                .id(1L)
-                .roomType("single room")
-                .roomPrice(BigDecimal.valueOf(100.0))
+
+        booking1 = Booking.builder()
+                .bookingId(1L)
+                .checkInDate(LocalDate.of(2026, 1, 10))
+                .checkOutDate(LocalDate.of(2026, 1, 12))
+                .guestName("Ahmet")
+                .guestEmail("ahmet@mail.com")
+                .numOfAdults(2)
+                .numOfChildren(0)
+                .bookingConfirmationCode("CONF-123")
+                .room(room)
+                .build();
+
+        booking2 = Booking.builder()
+                .bookingId(2L)
+                .checkInDate(LocalDate.of(2026, 2, 10))
+                .checkOutDate(LocalDate.of(2026, 2, 12))
+                .guestName("Mehmet")
+                .guestEmail("mehmet@mail.com")
+                .numOfAdults(3)
+                .numOfChildren(1)
+                .bookingConfirmationCode("CONF-456")
+                .room(room)
                 .build();
     }
 
     @Test
-    public void getAllBookings_shouldReturnListOfBookingDtos() {
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
+    void getAllBookings_whenFound_shouldReturnDtos() {
+        when(bookingRepository.findAll()).thenReturn(List.of(booking1, booking2));
 
         List<BookingDto> bookingDtos = bookingService.getAllBookings();
 
         assertNotNull(bookingDtos);
+        assertEquals("CONF-123", bookingDtos.get(0).getBookingConfirmationCode());
+        assertEquals("mehmet@mail.com", bookingDtos.get(1).getGuestEmail());
+
+        // verify(bookingRepository, times(1)).findAll();  --->  Alttakiyle aynıdır
+        verify(bookingRepository).findAll();
+    }
+
+    @Test
+    void getAllBookings_whenEmpty_shouldThrowBookingIsNotFoundException() {
+        when(bookingRepository.findAll()).thenReturn(List.of());
+
+        assertThrows(
+                BookingIsNotFoundException.class,
+                () -> bookingService.getAllBookings()
+        );
+
+        verify(bookingRepository).findAll();
+        verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test
+    void getBookingByConfirmationCode_whenFound_shouldReturnDto() {
+        when(bookingRepository.findByBookingConfirmationCode("CONF-123"))
+                .thenReturn(Optional.ofNullable(booking1));
+
+        BookingDto bookingDto = bookingService.getBookingByConfirmationCode("CONF-123");
+
+        assertEquals("Ahmet", bookingDto.getGuestName());
+        assertEquals(10L, bookingDto.getRoom().getId());
+
+        verify(bookingRepository).findByBookingConfirmationCode("CONF-123");
+    }
+
+    @Test
+    void getBookingByConfirmationCode_whenNotFound_shouldThrowBookingIsNotFoundException() {
+        when(bookingRepository.findByBookingConfirmationCode("XXX")).thenReturn(Optional.empty());
+
+        assertThrows(
+                BookingIsNotFoundException.class,
+                () -> bookingService.getBookingByConfirmationCode("XXX")
+        );
+
+        verify(bookingRepository).findByBookingConfirmationCode("XXX");
+    }
+
+    @Test
+    void getBookingsByEmail_whenFound_shouldReturnDtoList() {
+        when(bookingRepository.findByGuestEmail("ahmet@gmail.com")).thenReturn(List.of(booking1));
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByEmail("ahmet@gmail.com");
+
         assertEquals(1, bookingDtos.size());
-        assertEquals(bookingDto.getBookingId(), bookingDtos.get(0).getBookingId());
+        assertEquals("CONF-123", bookingDtos.get(0).getBookingConfirmationCode());
+        assertEquals("Ahmet", bookingDtos.get(0).getGuestName());
 
-        verify(bookingRepository, times(1)).findAll();
+        verify(bookingRepository).findByGuestEmail("ahmet@gmail.com");
     }
 
     @Test
-    public void getBookingByConfirmationCode_shouldReturnBookingDto() {
-        when(bookingRepository.findByBookingConfirmationCode("ABC12")).thenReturn(Optional.ofNullable(booking));
+    void getBookingsByEmail_whenEmpty_shouldThrowBookingIsNotFoundException() {
+        when(bookingRepository.findByGuestEmail("none@mail.com")).thenReturn(List.of());
 
-        BookingDto bookingDto = bookingService.getBookingByConfirmationCode("ABC12");
+        assertThrows(
+                BookingIsNotFoundException.class,
+                () -> bookingService.getBookingsByEmail("none@mail.com")
+        );
 
-        assertNotNull(bookingDto);
-        assertEquals(bookingDto.getBookingId(), booking.getBookingId());
-
-        verify(bookingRepository, times(1)).findByBookingConfirmationCode("ABC12");
+        verify(bookingRepository).findByGuestEmail("none@mail.com");
     }
 
     @Test
-    public void getBookingsByEmail_shouldReturnBookingDto() {
-        when(bookingRepository.findByGuestEmail(booking.getGuestEmail())).thenReturn(List.of(booking));
-
-        List<BookingDto> bookingDtos = bookingService.getBookingsByEmail(booking.getGuestEmail());
-
-        assertNotNull(bookingDtos);
-        assertEquals(1, bookingDtos.size());
-        assertEquals(bookingDto.getBookingId(), bookingDtos.get(0).getBookingId());
-
-        verify(bookingRepository, times(1)).findByGuestEmail(booking.getGuestEmail());
-    }
-
-    @Test
-    public void getBookingsByEmail_shouldThrowException() {
-        String email = "nonexistent@example.com";
-
-        when(bookingRepository.findByGuestEmail(email)).thenReturn(Collections.emptyList());
-
-        assertThrows(BookingIsNotFoundException.class, () -> {
-            bookingService.getBookingsByEmail(email);
-        });
-
-        verify(bookingRepository, times(1)).findByGuestEmail(email);
-    }
-
-    @Test
-    public void addBooking_shouldCreateAndReturnBookingDto() {
-        Long roomId = 1L;
-
-        // NOTE: bookingConfirmationCode ve room fieldları yollanmaz çünkü service'te addBooking() metodu içinde bu değerler otomatik oluşturuluyor
-        BookingDto newBookingDto = BookingDto.builder()
-                .checkInDate(LocalDate.parse("2023-07-01"))
-                .checkOutDate(LocalDate.parse("2023-07-05"))
-                .guestName("Jane Smith")
-                .guestEmail("jane.smith@example.com")
+    void addBooking_whenAvailable_shouldSaveAndReturnDto() {
+        BookingDto requestDto = BookingDto.builder()
+                .checkInDate(LocalDate.of(2026, 3, 10))
+                .checkOutDate(LocalDate.of(2026, 3, 12))
+                .guestName("Ahmet")
+                .guestEmail("ahmet@mail.com")
                 .numOfAdults(2)
                 .numOfChildren(0)
                 .build();
 
-        Room availableRoom = Room.builder()
-                .id(roomId)
-                .roomType("double room")
-                .roomPrice(BigDecimal.valueOf(150.0))
-                .isBooked(false)
+        Room emptyRoom = Room.builder()
+                .id(10L)
+                .roomType("DELUXE")
+                .roomPrice(new BigDecimal("1500.00"))
                 .bookings(new ArrayList<>())
                 .build();
 
-        Booking newBooking = Booking.builder()
-                .bookingId(2L)
-                .checkInDate(newBookingDto.getCheckInDate())
-                .checkOutDate(newBookingDto.getCheckOutDate())
-                .guestName(newBookingDto.getGuestName())
-                .guestEmail(newBookingDto.getGuestEmail())
-                .numOfAdults(newBookingDto.getNumOfAdults())
-                .numOfChildren(newBookingDto.getNumOfChildren())
-                .bookingConfirmationCode("ABC123")
-                .room(availableRoom)
-                .build();
+        when(roomService.getRoomEntityById(10L)).thenReturn(emptyRoom);
 
-        when(roomService.getRoomEntityById(roomId)).thenReturn(availableRoom);
-        when(bookingRepository.save(any(Booking.class))).thenReturn(newBooking);
+        /*
+            Mockito Answer & thenAnswer:
+            Stub edilen metodun dönüşünü çağrı anındaki parametreye göre dinamik üretmek gerektiğinde kullanılır
+            Özellikle repository save davranışını simüle etmek için idealdir
+            Gerçekten DB, save() sonrası ID set eder
+            save(...) çağrılınca kaydedilmiş gibi geri dönmek için Answer kullanıyoruz
+            Böylece service dönüşündeki mapping'i test edebiliriz
 
-        BookingDto result = bookingService.addBooking(roomId, newBookingDto);
+            thenReturn vs thenAnswer
+            - thenReturn: Sabit bir değer döner. Parametreler dikkate alınmaz. Basit senaryolar için yeterlidir
+            - thenAnswer: Parametreye bakar. Dinamik dönüş üretir. Gerçek davranışı simüle eder
+        */
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
+            Booking toSave = invocation.getArgument(0);
+            toSave.setBookingId(999L); // DB id set etti varsayalım
+            return toSave;
+        });
 
-        assertNotNull(result);
-        assertEquals(newBooking.getBookingId(), result.getBookingId());
-        assertEquals(newBooking.getGuestName(), result.getGuestName());
-        assertEquals(newBooking.getBookingConfirmationCode(), result.getBookingConfirmationCode());
+        BookingDto result = bookingService.addBooking(10L, requestDto);
 
-        verify(roomService, times(1)).getRoomEntityById(roomId);
-        verify(bookingRepository, times(1)).save(any(Booking.class));
+        assertEquals(999L, result.getBookingId());
+        assertEquals("Ahmet", result.getGuestName());
+        assertNotNull(result.getBookingConfirmationCode()); // Room.addBooking(...) UUID üretir
+
+        verify(roomService).getRoomEntityById(10L);
+        verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test
-    public void addBooking_withInvalidDates_shouldThrowException() {
-        // Given
-        Long roomId = 1L;
-        BookingDto invalidBookingDto = BookingDto.builder()
-                .checkInDate(LocalDate.parse("2023-07-05"))  // Check-in after check-out
-                .checkOutDate(LocalDate.parse("2023-07-01"))
-                .guestName("Jane Smith")
-                .guestEmail("jane.smith@example.com")
+    void addBooking_whenCheckoutDateIsBeforeCheckinDate_shouldThrowInvalidBookingRequestException() {
+        BookingDto requestDto = BookingDto.builder()
+                .checkInDate(LocalDate.of(2026, 1, 12))
+                .checkOutDate(LocalDate.of(2026, 1, 10)) // invalid
+                .guestName("Ahmet")
+                .guestEmail("ahmet@mail.com")
                 .numOfAdults(2)
                 .numOfChildren(0)
                 .build();
 
-        // When & Then
-        assertThrows(InvalidBookingRequestException.class, () -> {
-            bookingService.addBooking(roomId, invalidBookingDto);
-        });
+        assertThrows(
+                InvalidBookingRequestException.class,
+                () -> bookingService.addBooking(10L, requestDto)
+        );
 
-        // Verify that repository methods were not called
-        verify(roomService, never()).getRoomEntityById(anyLong());
-        verify(bookingRepository, never()).save(any(Booking.class));
+        // Bu senaryoda RoomService hiç çağrılmamalı (date validation daha önce patlıyor)
+        verifyNoInteractions(roomService);
+        verifyNoInteractions(bookingRepository);
     }
 
     @Test
-    public void addBooking_whenRoomNotAvailable_shouldThrowException() {
-        // Given
-        Long roomId = 1L;
-
-        // Make sure room has a properly initialized bookings list
-        if (room.getBookings() == null) {
-            room.setBookings(new ArrayList<>());
-        }
-
-        // Ensure the existing booking is in the room's bookings list
-        if (!room.getBookings().contains(booking)) {
-            room.getBookings().add(booking);
-        }
-
-        // Create a booking with dates that overlap with existing booking
-        BookingDto overlappingBookingDto = BookingDto.builder()
-                .checkInDate(LocalDate.parse("2023-06-03"))  // Overlaps with existing booking (2023-06-01 to 2023-06-05)
-                .checkOutDate(LocalDate.parse("2023-06-07"))
-                .guestName("Jane Smith")
-                .guestEmail("jane.smith@example.com")
+    void addBooking_whenRoomNotAvailable_shouldThrowRoomIsNotAvailableException_andNotSave() {
+        BookingDto requestDto = BookingDto.builder()
+                .checkInDate(LocalDate.of(2026, 1, 10))
+                .checkOutDate(LocalDate.of(2026, 1, 12))
+                .guestName("Ahmet")
+                .guestEmail("ahmet@mail.com")
                 .numOfAdults(2)
                 .numOfChildren(0)
                 .build();
 
-        when(roomService.getRoomEntityById(roomId)).thenReturn(room);
+        // Room üzerinde aynı checkInDate'e sahip bir booking varsa availability false'a düşer
+        Room roomWithExistingBooking = Room.builder()
+                .id(10L)
+                .roomType("DELUXE")
+                .roomPrice(new BigDecimal("1500.00"))
+                .bookings(new ArrayList<>(List.of(
+                        Booking.builder()
+                                .checkInDate(LocalDate.of(2026, 1, 10))
+                                .checkOutDate(LocalDate.of(2026, 1, 15))
+                                .build()
+                )))
+                .build();
 
-        // When & Then
-        assertThrows(RoomIsNotAvailableException.class, () -> {
-            bookingService.addBooking(roomId, overlappingBookingDto);
-        });
+        when(roomService.getRoomEntityById(10L)).thenReturn(roomWithExistingBooking);
 
-        verify(roomService, times(1)).getRoomEntityById(roomId);
-        verify(bookingRepository, never()).save(any(Booking.class));
-    }
+        assertThrows(
+                RoomIsNotAvailableException.class,
+                () -> bookingService.addBooking(10L, requestDto)
+        );
 
-
-    @Test
-    public void deleteBooking_shouldDeleteSuccessfully() {
-        // Given
-        Long bookingId = 1L;
-        when(bookingRepository.existsById(bookingId)).thenReturn(true);
-        doNothing().when(bookingRepository).deleteById(bookingId);
-
-        // When
-        bookingService.deleteBooking(bookingId);
-
-        // Then
-        verify(bookingRepository, times(1)).existsById(bookingId);
-        verify(bookingRepository, times(1)).deleteById(bookingId);
+        verify(roomService).getRoomEntityById(10L);
+        verify(bookingRepository, never()).save(any());
     }
 
     @Test
-    public void deleteBooking_whenBookingNotFound_shouldThrowException() {
-        // Given
-        Long nonExistentId = 999L;
-        when(bookingRepository.existsById(nonExistentId)).thenReturn(false);
+    void deleteBooking_whenExists_shouldDelete() {
+        when(bookingRepository.existsById(55L)).thenReturn(true);
 
-        // When & Then
-        assertThrows(BookingIsNotFoundException.class, () -> {
-            bookingService.deleteBooking(nonExistentId);
-        });
+        doNothing().when(bookingRepository).deleteById(55L);
 
-        verify(bookingRepository, times(1)).existsById(nonExistentId);
+        bookingService.deleteBooking(55L);
+
+        verify(bookingRepository).existsById(55L);
+        verify(bookingRepository).deleteById(55L);
+    }
+
+    @Test
+    void deleteBooking_whenNotExists_shouldThrowBookingIsNotFoundException_andNotDelete() {
+        when(bookingRepository.existsById(55L)).thenReturn(false);
+
+        assertThrows(BookingIsNotFoundException.class, () -> bookingService.deleteBooking(55L));
+
+        verify(bookingRepository).existsById(55L);
         verify(bookingRepository, never()).deleteById(anyLong());
     }
 }
