@@ -64,11 +64,34 @@ public class SecurityConfig {
         return new JwtAuthFilter();
     }
 
+    /*
+        PasswordEncoder:
+        - Parolaların hashlenmesi ve karşılaştırılması için kullanılan bileşendir
+        - Password decrypt edilmez
+        - Hash tekrar üretilir ve karşılaştırılır
+
+        Neden BCrypt?
+        - Salt otomatik
+        - Adaptive
+        - Brute-force resistant
+    */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /*
+        DaoAuthenticationProvider:
+        - Spring'in default provider'ıdır
+        - Gerçek doğrulama işini yapan bileşendir
+        - Username/password kontrolü, UserDetailsService çağrısı, PasswordEncoder ile karşılaştırma işlerini yapar
+
+        Authentication sırasında ne yapar?
+        - UserDetailsService.loadUserByUsername() çağrılır
+        - DB’den UserDetails döner
+        - Girilen password → PasswordEncoder.matches()
+        - Başarılıysa Authentication üretilir
+    */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -77,6 +100,17 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
+    /*
+        AuthenticationManager:
+        - Authentication işleminin orkestratörüdür
+        - "Authentication yap” denildiğinde hangi provider’ı kullanacağını seçer, sırasıyla dener ve başarılıysa sonucu döner
+
+        - Genellikle login endpointinde aşağıdaki gibi kullanılır:
+
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(username, password)
+        );
+    */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

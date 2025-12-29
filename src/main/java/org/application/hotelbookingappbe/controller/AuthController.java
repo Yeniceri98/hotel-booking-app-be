@@ -44,8 +44,10 @@ public class AuthController {
                         loginRequest.getEmail(), loginRequest.getPassword()
                 )
         );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwtToken = jwtUtils.generateJwtToken(authentication);      // Generating JWT token
+
+        // SecurityContextHolder, SecurityContext’e her yerden erişim sağlayan holderdır
+        SecurityContextHolder.getContext().setAuthentication(authentication);   // Authentication, SecurityContext'e set edildi
+        String jwtToken = jwtUtils.generateJwtToken(authentication);            // Generating JWT token
 
         HotelUserDetails userDetails = (HotelUserDetails) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities()
